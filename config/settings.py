@@ -23,7 +23,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'app',  # Мое приложение
+    'rest_framework_simplejwt', # добавим библиотеку для возврата токена при авторизации
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
 
 # Промежуточное ПО
 MIDDLEWARE = [
