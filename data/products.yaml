@@ -1,0 +1,94 @@
+products:
+  - name: "Беспроводные наушники Sony WH-1000XM5"
+    supplier: "AudioGadgets"
+    description: "Шумоподавляющие наушники премиум-класса"
+    price: 349.99
+    quantity: 15
+    characteristics:
+      battery_life: "30 часов"
+      connectivity: "Bluetooth 5.2"
+      weight: "250 г"
+
+  - name: "Электрический чайник Bosch TWK7201"
+    supplier: "HomeTech"
+    price: 59.90
+    quantity: 40
+    characteristics:
+      capacity: "1.7 л"
+      power: "2400 Вт"
+      material: "Нержавеющая сталь"
+
+  - name: "Фитнес-браслет Xiaomi Mi Band 7"
+    supplier: "WearableTech"
+    price: 89.00
+    quantity: 100
+    characteristics:
+      screen: "1.62-дюймов AMOLED"
+      water_resistance: "5 ATM"
+      battery: "14 дней"
+
+  - name: "Игровая мышь Razer DeathAdder V2"
+    supplier: "GamingPro"
+    description: "Эргономичная мышь для киберспорта"
+    price: 69.99
+    quantity: 25
+    characteristics:
+      dpi: "20000"
+      buttons: 8
+      weight: "82 г"
+
+  - name: "Умная колонка Яндекс Станция Мини 2"
+    supplier: "SmartHome"
+    price: 99.00
+    quantity: 60
+    characteristics:
+      assistants: "Алиса"
+      speakers: "10 Вт"
+      colors: ["черный", "синий"]
+
+  - name: "Электросамокат Ninebot Kickscooter MAX"
+    supplier: "EcoTransport"
+    price: 799.00
+    quantity: 8
+    characteristics:
+      max_speed: "30 км/ч"
+      range: "65 км"
+      weight: "23.5 кг"
+
+  - name: "Электронная книга PocketBook 740"
+    supplier: "ReadTech"
+    description: "7.8-дюймовый ридер с подсветкой"
+    price: 299.00
+    quantity: 18
+    characteristics:
+      storage: "32 GB"
+      format_support: ["PDF", "EPUB", "FB2"]
+      battery: "6000 mAh"
+
+  - name: "Робот-пылесос iRobot Roomba i3"
+    supplier: "SmartCleaning"
+    price: 449.00
+    quantity: 12
+    characteristics:
+      navigation: "Smart Mapping"
+      runtime: "90 мин"
+      dustbin: "0.5 л"
+    
+  - name: "Ноутбук Lenovo IdeaPad 3"
+    supplier: "ElectroTech"
+    description: "15.6-дюймовый ноутбук с процессором AMD Ryzen 5"
+    price: 549.99
+    quantity: 10
+    characteristics:
+      processor: "AMD Ryzen 5 5500U"
+      ram: "8 GB"
+      storage: "256 GB SSD"
+
+  - name: "Смартфон Samsung Galaxy S23"
+    supplier: "MobileWorld"
+    price: 799.00
+    quantity: 25
+    characteristics:
+      screen: "6.1-дюймов AMOLED"
+      camera: "50 MP"
+      battery: "3900 mAh"
