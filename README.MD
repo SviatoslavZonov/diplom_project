@@ -116,25 +116,29 @@
 
 ## Этап 1. Создание и настройка проекта
 
-1. Установка зависимостей
+1. Клонирование репозитория (при проверке)
+git clone git clone https://github.com/SviatoslavZonov/diplom_project.git 
+cd diplom_project
+
+2. Установка зависимостей
 pip install django djangorestframework django-filter celery
 
-2. Создайте новый Django-проект и приложение:
+3. Создайте новый Django-проект и приложение (при создании нового):
 django-admin startproject myproject
 cd myproject  # Переход в папку проекта
 python manage.py startapp app  # Создание приложения "app"
 
-3. Настройка виртуального окружения
+4. Настройка виртуального окружения
 python -m venv venv
 source venv/bin/activate  # Linux/MacOS
 
 py -m venv venv            # Windows
 venv\Scripts\activate     
 
-4. Установка зависимостей
+5. Установка пакетов
 pip install -r requirements.txt  # Если файл существует или создайте requirements.txt с зависимостями
 
-5. Запуск сервера разработки
+6. Запуск сервера разработки
 python manage.py runserver
 Проверка: Откройте http://localhost:8000
 
@@ -193,6 +197,26 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py import_products
 
+## Этап 4. Реализация APIViews
+Пропишем код всем заявленным критериям:
+- Авторизация - реализована через LoginView (JWT токены)
+- Регистрация - реализована через RegisterView
+- Получение списка товаров - через ProductViewSet
+- Получение спецификации по товару - через ProductViewSet
+- Работа с корзиной - полный CRUD через CartViewSet
+- Добавление/удаление адреса доставки - через ContactViewSet
+- Подтверждение заказа - через confirm action в OrderViewSet 
+- Отправка email с подтверждением - реализованы 3 метода отправки email
+- Получение списка заказов - через OrderViewSet и OrderHistoryView
+- Получение деталей заказа - через OrderViewSet
+- Редактирование статуса заказа - через update_status action
+
+Дополнительные возможности реализации:
+- Использование JWT для аутентификации
+- Фильтрация и поиск для товаров
+- Автоматический расчет общей суммы заказа
+- Раздельные методы для разных типов email-уведомлений
+- Проверка прав для всех критических операций
 
 # Коммиты оставляю поэтапно в Git, параллельно с доработкой и исправлениями в readme.md
 

@@ -1,18 +1,22 @@
-from rest_framework import viewsets, generics, status
+from rest_framework import viewsets, generics, status, permissions, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import PermissionDenied
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-
-from .models import Product, Cart, Contact, Order
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+from rest_framework.decorators import action
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from .models import Product, Cart, Contact, Order, OrderItem
 from .serializers import (
-    ProductSerializer, CartSerializer, ContactSerializer,
-    OrderSerializer, LoginSerializer, RegisterSerializer
+    ProductSerializer, CartSerializer,
+    ContactSerializer, OrderSerializer,
+    LoginSerializer, RegisterSerializer
 )
+
+User = get_user_model()
 
 # Товары
 class ProductViewSet(viewsets.ModelViewSet):
@@ -21,43 +25,12 @@ class ProductViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['supplier', 'price']
     search_fields = ['name', 'description']
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 # Корзина
 class CartViewSet(viewsets.ModelViewSet):
-    queryset = Cart.objects.all()
     serializer_class = CartSerializer
-
-# Контакты
-class ContactViewSet(viewsets.ModelViewSet):
-    queryset = Contact.objects.all()
-    serializer_class = ContactSerializer
-
-# Заказы
-class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-
-# Регистрация
-class RegisterView(APIView):
-    def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# Авторизация
-class LoginView(TokenObtainPairView):
-    serializer_class = LoginSerializer
-
-# Корзина: добавление товара
-class CartView(generics.ListCreateAPIView):
-    serializer_class = CartSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user)
@@ -65,28 +38,20 @@ class CartView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-# Корзина: удаление товара
-class CartDetailView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = CartSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Cart.objects.filter(user=self.request.user)
-
     def perform_update(self, serializer):
         if serializer.instance.user != self.request.user:
-            raise PermissionDenied("You do not have permission to edit this cart.")
+            raise permissions.PermissionDenied("Нет прав для изменения этой корзины")
         serializer.save()
 
     def perform_destroy(self, instance):
         if instance.user != self.request.user:
-            raise PermissionDenied("You do not have permission to delete this cart.")
+            raise permissions.PermissionDenied("Нет прав для удаления этой корзины")
         instance.delete()
 
-# Добавление контакта
-class ContactView(generics.ListCreateAPIView):
+# Контакты
+class ContactViewSet(viewsets.ModelViewSet):
     serializer_class = ContactSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Contact.objects.filter(user=self.request.user)
@@ -94,22 +59,132 @@ class ContactView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-# Заказ: подтверждение
-class OrderView(generics.ListCreateAPIView):
+# Заказы
+class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Order.objects.all()
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        cart_items = Cart.objects.filter(user=self.request.user)
+        if not cart_items.exists():
+            raise serializers.ValidationError("Корзина пуста")
+
+        total_price = sum(item.product.price * item.quantity for item in cart_items)
+        order = serializer.save(user=self.request.user, total_price=total_price)
+        
+        # Создаем OrderItems
+        for item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                price=item.product.price
+            )
+        
+        cart_items.delete()
+        self.send_order_email(order)
+
+    @action(detail=True, methods=['post'])
+    def confirm(self, request, pk=None):
+        order = self.get_object()
+        if order.user != request.user:
+            return Response({'error': 'Недостаточно прав'}, status=status.HTTP_403_FORBIDDEN)
+        
+        if order.status != Order.Status.PENDING:
+            return Response({'error': 'Заказ уже обрабатывается или завершен'}, 
+                          status=status.HTTP_400_BAD_REQUEST)
+        
+        order.status = Order.Status.PROCESSING
+        order.save()
+        self.send_confirmation_email(order)
+        
+        return Response({'status': 'Заказ подтвержден'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['patch'])
+    def update_status(self, request, pk=None):
+        if not request.user.is_staff:
+            return Response({'error': 'Только администратор может изменять статус'}, 
+                          status=status.HTTP_403_FORBIDDEN)
+        
+        order = self.get_object()
+        new_status = request.data.get('status')
+        
+        if not new_status or new_status not in dict(Order.Status.choices):
+            return Response({'error': 'Неверный статус'}, 
+                          status=status.HTTP_400_BAD_REQUEST)
+            
+        order.status = new_status
+        order.save()
+        
+        if new_status == Order.Status.COMPLETED:
+            self.send_completion_email(order)
+            
+        return Response(OrderSerializer(order).data)
+
+    def send_order_email(self, order):
+        subject = f'Новый заказ #{order.id}'
+        message = f'Ваш заказ #{order.id} успешно создан. Статус: {order.get_status_display()}'
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [order.user.email],
+            fail_silently=False,
+        )
+
+    def send_confirmation_email(self, order):
+        subject = f'Заказ #{order.id} подтвержден'
+        message = f'Ваш заказ #{order.id} передан в обработку.'
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [order.user.email],
+            fail_silently=False,
+        )
+
+    def send_completion_email(self, order):
+        subject = f'Заказ #{order.id} завершен'
+        message = f'Ваш заказ #{order.id} успешно завершен.'
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [order.user.email],
+            fail_silently=False,
+        )
+
+# Регистрация
+class RegisterView(APIView):
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "user": RegisterSerializer(user).data,
+            "refresh": str(refresh),
+            "access": str(refresh.access_token)
+        }, status=status.HTTP_201_CREATED)
+
+# Авторизация
+class LoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer
+    permission_classes = [permissions.AllowAny]
 
 # История заказов
 class OrderHistoryView(generics.ListAPIView):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['created_at']
 
     def get_queryset(self):
-        user = self.request.user
-        return Order.objects.filter(user=user)
+        return Order.objects.filter(user=self.request.user)

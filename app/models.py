@@ -166,3 +166,10 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product} x{self.quantity}"
+
+# Статус
+class Status(models.TextChoices):
+    PENDING = 'pending', _('В обработке')
+    PROCESSING = 'processing', _('В процессе')
+    COMPLETED = 'completed', _('Завершен')
+    CANCELLED = 'cancelled', _('Отменен')
