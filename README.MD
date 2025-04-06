@@ -251,7 +251,7 @@ python manage.py import_products
 Провести тестирование через Postman:
 Регистрация → Авторизация → Добавление товаров → Создание контакта → Подтверждение заказа → Проверка истории заказов.
 
-Примеры запросов с описанием в файле [requests-examples.http](./requests-examples.http).
+Примеры запросов с описанием в файле [requests-examples.http](./app/requests-examples.http).
 
 
 # Коммиты оставляю поэтапно в Git, параллельно с доработкой и исправлениями в readme.md
