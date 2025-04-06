@@ -22,12 +22,12 @@ router.register(r'orders', OrderViewSet, basename='order')
 
 urlpatterns = [
     # Эндпоинты аутентификации
-    path('api/auth/register/', RegisterView.as_view(), name='register'),
-    path('api/auth/login/', LoginView.as_view(), name='login'),
+    path('auth/register/', RegisterView.as_view(), name='register'),  # Исправлено: убран префикс api/
+    path('auth/login/', LoginView.as_view(), name='login'),
     
     # Эндпоинты для заказов
-    path('api/orders/history/', OrderHistoryView.as_view(), name='order-history'),
+    path('orders/history/', OrderHistoryView.as_view(), name='order-history'),
     
     # Подключаем все зарегистрированные ViewSets
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),  # Исправлено: убран префикс api/
 ]

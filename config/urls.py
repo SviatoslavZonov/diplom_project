@@ -6,12 +6,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     # Админка Django
     path('admin/', admin.site.urls),
-    
     # API версии 1
-    path('api/v1/', include(('app.urls', 'app'), namespace='v1')),
-    
-    # Дополнительные маршруты (если есть)
-    # path('api/v2/', include(('app.v2.urls', 'app'), namespace='v2')),
+    path('api/', include('app.urls')),  # Префикс v1/ уберем
+    # path('api/v1/', include('app.urls')),  # Префикс api/v1/ остается
 ]
 
 # Добавляем поддержку медиафайлов в режиме разработки

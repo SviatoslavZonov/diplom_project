@@ -40,6 +40,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# кастомная модель
+AUTH_USER_MODEL = 'app.CustomUser'
+
 # Корневой URL-конфиг
 ROOT_URLCONF = 'config.urls'
 
@@ -107,10 +110,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 465
+EMAIL_PORT = 465  # Для SSL
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'ваш_email@yandex.ru'
-EMAIL_HOST_PASSWORD = 'ваш_пароль'
+EMAIL_HOST_USER = 'test1234API@yandex.ru'     # Полный email, нужно разрешить доступ к почтовому ящику с помощью почтовых клиентов в яндексе
+EMAIL_HOST_PASSWORD = '***********'      # Пароль от почты приложения для яндекс айди, SMTP
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # REST Framework
@@ -123,6 +126,10 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+    ],
 }
 
 # JWT Settings
@@ -131,10 +138,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-## CORS, если будет фронтенд на отдельном домене
-# INSTALLED_APPS += ['corsheaders']
-# MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
-# CORS_ALLOW_ALL_ORIGINS = True  # Для разработки, в продакшене указать конкретные домены
+# CORS, если будет фронтенд на отдельном домене
+CORS_ALLOW_ALL_ORIGINS = True  # Для разработки, в продакшене указать конкретные домены
 
 # Безопасность (для production)
 if not DEBUG:

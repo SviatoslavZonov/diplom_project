@@ -161,18 +161,37 @@ class OrderViewSet(viewsets.ModelViewSet):
 # Регистрация
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
-    
+
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        
+
+        # Отправляем email с подтверждением регистрации
+        self.send_registration_email(user)
+
         refresh = RefreshToken.for_user(user)
         return Response({
             "user": RegisterSerializer(user).data,
             "refresh": str(refresh),
             "access": str(refresh.access_token)
         }, status=status.HTTP_201_CREATED)
+
+    def send_registration_email(self, user):
+        subject = 'Подтверждение регистрации'
+        message = (
+            f'Здравствуйте, {user.first_name} {user.last_name}!\n\n'
+            'Благодарим за регистрацию в сервисе автоматизации закупок.\n'
+            'Ваш аккаунт успешно создан.\n\n'
+            'С уважением, команда сервиса.'
+        )
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=False,
+        )
 
 # Авторизация
 class LoginView(TokenObtainPairView):

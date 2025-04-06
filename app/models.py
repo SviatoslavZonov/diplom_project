@@ -1,7 +1,35 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.utils.translation import gettext_lazy as _
+
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("Email обязателен")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        return self.create_user(email, password, **extra_fields)
+
+class CustomUser(AbstractUser):
+    username = None
+    email = models.EmailField(unique=True)
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()  # Используем кастомный менеджер
+
+    def __str__(self):
+        return self.email
 
 class Supplier(models.Model):
     name = models.CharField(_("Название"), max_length=100)
@@ -46,7 +74,7 @@ class Product(models.Model):
 
 class Cart(models.Model):
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name=_("Пользователь"),
         related_name="carts"
@@ -66,14 +94,14 @@ class Cart(models.Model):
     class Meta:
         verbose_name = _("Корзина")
         verbose_name_plural = _("Корзины")
-        unique_together = [["user", "product"]]
+        unique_together = [["user", "product"]] # Товар не дублируется в корзине
 
     def __str__(self):
         return f"{self.user}: {self.product} x{self.quantity}"
 
 class Contact(models.Model):
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name=_("Пользователь"),
         related_name="contacts"
@@ -105,7 +133,7 @@ class Order(models.Model):
         CANCELLED = "cancelled", _("Отменен")
 
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name=_("Пользователь"),
         related_name="orders"
@@ -166,10 +194,3 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product} x{self.quantity}"
-
-# Статус
-class Status(models.TextChoices):
-    PENDING = 'pending', _('В обработке')
-    PROCESSING = 'processing', _('В процессе')
-    COMPLETED = 'completed', _('Завершен')
-    CANCELLED = 'cancelled', _('Отменен')
