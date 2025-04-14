@@ -1,39 +1,57 @@
 services:
   db:
-    image: postgres:13
+    image: postgres:15
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydb
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-mydb}
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  redis:
+    image: redis:7
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
 
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 config.wsgi:application"
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-mydb}
+      CELERY_BROKER_URL: redis://redis:6379/0
     volumes:
-      - .:/code
+      - static_volume:/app/static
     ports:
       - "8000:8000"
     depends_on:
       - db
-  
-  redis:
-    image: redis:7
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
+      - redis
+    networks:
+      - backend
 
   celery_worker:
     build: .
     command: celery -A config worker --loglevel=info
-    volumes:
-      - .:/code
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-mydb}
+      CELERY_BROKER_URL: redis://redis:6379/0
     depends_on:
       - db
       - redis
+    networks:
+      - backend
 
 volumes:
   postgres_data:
   redis_data:
+  static_volume:
+
+networks:
+  backend:

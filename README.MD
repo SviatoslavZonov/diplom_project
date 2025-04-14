@@ -287,6 +287,18 @@ python manage.py runserver
 Отправьте тестовый заказ → проверьте логи Celery (должно быть Task send_email succeeded).
 Запустите импорт через API → в логах Celery появится Task do_import succeeded.
 
+## Этап 8. Создание docker-compose файла для приложения
+Инструкция по сборке и запуску:
+1. Установите Docker и Docker Compose
+2. Соберите и запустите контейнеры:
+docker-compose up --build
+3. Выполните миграции (если не включены):
+docker-compose exec web python manage.py migrate
+4. Создайте суперпользователя:
+docker-compose exec web python manage.py createsuperuser
+5. Остановите контейнеры:
+docker-compose down
+
 
 # Коммиты оставляю поэтапно в Git, параллельно с доработкой и исправлениями в readme.md
 
