@@ -138,6 +138,11 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
+# Настройки Celery
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Локальный Redis
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_TASK_DEFAULT_QUEUE = 'default'
+
 # CORS, если будет фронтенд на отдельном домене
 CORS_ALLOW_ALL_ORIGINS = True  # Для разработки, в продакшене указать конкретные домены
 

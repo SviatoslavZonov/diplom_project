@@ -253,6 +253,31 @@ python manage.py import_products
 
 Примеры запросов с описанием в файле [requests-examples.http](./app/requests-examples.http).
 
+## Этап 6. Реализация API views админки склада
+Реализованы API views для страниц админки сервиса.
+
+## Этап 7. Вынос медленных методов в задачи Celery
+1. Создано Celery-приложение c методами:
+   - send_email,
+   - do_import.
+2. Создан view для запуска Celery-задачи do_import из админки.
+
+Установите celery и redis: 
+pip install celery redis
+
+Запустите Redis:
+redis-server
+
+Запустите Celery worker:
+celery -A config worker --loglevel=info
+
+Запустите Django:
+python manage.py runserver
+
+Проверка:
+Отправьте тестовый заказ → проверьте логи Celery (должно быть Task send_email succeeded).
+Запустите импорт через API → в логах Celery появится Task do_import succeeded.
+
 
 # Коммиты оставляю поэтапно в Git, параллельно с доработкой и исправлениями в readme.md
 

@@ -1,3 +1,4 @@
+import os
 from rest_framework import viewsets, generics, status, permissions, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,6 +16,7 @@ from .serializers import (
     ContactSerializer, OrderSerializer,
     LoginSerializer, RegisterSerializer
 )
+from app.tasks import send_email, do_import
 
 User = get_user_model()
 
@@ -125,38 +127,21 @@ class OrderViewSet(viewsets.ModelViewSet):
             
         return Response(OrderSerializer(order).data)
 
+# Заменим вызовы send_mail на асинхронные задачи
     def send_order_email(self, order):
         subject = f'Новый заказ #{order.id}'
         message = f'Ваш заказ #{order.id} успешно создан. Статус: {order.get_status_display()}'
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [order.user.email],
-            fail_silently=False,
-        )
+        send_email.delay(subject, message, [order.user.email])  # Вызов задачи
 
     def send_confirmation_email(self, order):
         subject = f'Заказ #{order.id} подтвержден'
         message = f'Ваш заказ #{order.id} передан в обработку.'
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [order.user.email],
-            fail_silently=False,
-        )
+        send_email.delay(subject, message, [order.user.email])
 
     def send_completion_email(self, order):
         subject = f'Заказ #{order.id} завершен'
         message = f'Ваш заказ #{order.id} успешно завершен.'
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [order.user.email],
-            fail_silently=False,
-        )
+        send_email.delay(subject, message, [order.user.email])
 
 # Регистрация
 class RegisterView(APIView):
@@ -207,3 +192,11 @@ class OrderHistoryView(generics.ListAPIView):
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
+
+# запуск импорта через API асинхронно
+class AdminViewSet(viewsets.ViewSet):
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def run_import(self, request):
+        path = os.path.join(settings.BASE_DIR, 'data')
+        do_import.delay(path)  # Асинхронный запуск
+        return Response({"status": "Импорт запущен"}, status=200)

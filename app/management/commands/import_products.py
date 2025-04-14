@@ -3,6 +3,11 @@ import os
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from app.models import Product, Supplier
+from celery import shared_task
+
+@shared_task
+def import_products_task(path):
+    Command().handle(path=path)
 
 class Command(BaseCommand):  # Обязательно назвать класс Command
     help = 'Импорт товаров из YAML-файлов'
