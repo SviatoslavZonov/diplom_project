@@ -1,0 +1,115 @@
+# примеры API-запросов для проверки администрирования в Postman
+
+@baseUrl = http://localhost:8000
+
+
+#  Подготовьте Access Token:
+
+POST {{baseUrl}}/api/auth/login/
+Content-Type: application/json
+
+{
+    "email": "admin@example.com",  # Email суперпользователя
+    "password": "password123"      # Пароль суперпользователя
+}
+
+# В ответе должны быть токены (access и refresh). 
+
+###
+
+
+# Получить список всех пользователей
+GET {{baseUrl}}/api/admin/users/
+Content-Type: application/json
+
+Authorization: Bearer {{"admin_access_token"}}
+
+# Ответ:
+[ 
+  {
+    "id": 1,
+    "email": "admin@example.com",
+    "first_name": "Admin",
+    "last_name": "User",
+    "is_staff": true
+  },
+  ...
+] 
+
+###
+
+
+# Создать нового поставщика
+POST {{baseUrl}}/api/admin/suppliers/
+Authorization: Bearer {{"admin_access_token"}}
+Content-Type: application/json
+
+{
+  "name": "Новый поставщик"
+}
+
+# Проверка: Статус: 201 OK. Должен быть json. Пример:
+{
+  "id": 1,
+  "name": "Новый поставщик",
+  "is_active": true,
+  "created_at": "2025-04-05T12:00:00Z"
+}
+###
+
+
+#  Получить все заказы
+GET {{baseUrl}}/api/admin/orders/
+Authorization: Bearer {{"admin_access_token"}}
+
+# Проверка: Статус: 201 ОК. Должен быть json. Пример:
+[
+  {
+    "id": 1,
+    "user": "user@example.com",
+    "status": "pending",
+    "total_price": "299.99",
+    "created_at": "2025-04-05T12:00:00Z"
+  },
+  ...
+]
+###
+
+
+# Изменить статус заказа
+PATCH {{baseUrl}}/api/admin/orders/1/update_status/
+Authorization: Bearer {{"admin_access_token"}}
+Content-Type: application/json
+
+{
+  "status": "completed"
+}
+
+# Проверка: Статус: 201 ОК. Должен быть json. Пример:
+{
+  "id": 1,
+  "status": "completed",
+  "updated_at": "2023-10-05T12:05:00Z"
+}
+
+###
+
+## Проверка ошибок
+# Доступ без токена
+GET {{baseUrl}}/api/admin/users/
+
+# Проверка: Статус: 401 Unauthorized. Должен быть json. Пример:
+{
+  "detail": "Учетные данные не были предоставлены."
+}
+
+###
+
+
+# Доступ с токеном обычного пользователя
+GET {{baseUrl}}/api/admin/users/
+
+# Проверка: Статус: 403 Forbidden. 
+{
+  "detail": "У вас недостаточно прав для выполнения данного действия."
+}

@@ -1,8 +1,14 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from app.models import Product, Cart, Contact, Order, OrderItem
+from app.models import Product, Cart, Contact, Order, OrderItem, Supplier
 
 User = get_user_model()
+
+# Сериализатор для поставщиков (админ)
+class SupplierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Supplier
+        fields = '__all__'
 
 # Регистрация
 class RegisterSerializer(serializers.ModelSerializer):

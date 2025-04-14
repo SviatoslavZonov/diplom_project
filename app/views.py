@@ -1,5 +1,6 @@
 import os
 from rest_framework import viewsets, generics, status, permissions, serializers
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -10,7 +11,7 @@ from rest_framework.decorators import action
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from .models import Product, Cart, Contact, Order, OrderItem
+from .models import CustomUser, Product, Cart, Contact, Order, OrderItem, Supplier
 from .serializers import (
     ProductSerializer, CartSerializer,
     ContactSerializer, OrderSerializer,
@@ -20,6 +21,54 @@ from app.tasks import send_email, do_import
 
 User = get_user_model()
 
+## Админмстраторы
+# запуск импорта через API асинхронно
+class AdminViewSet(viewsets.ViewSet):
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def run_import(self, request):
+        path = os.path.join(settings.BASE_DIR, 'data')
+        do_import.delay(path)  # Асинхронный запуск
+        return Response({"status": "Импорт запущен"}, status=200)
+
+# Управление пользователями (администратор)
+class AdminUserViewSet(viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = RegisterSerializer  # Используем существующий сериализатор
+    permission_classes = [IsAdminUser]
+    http_method_names = ['get', 'post', 'patch', 'delete']  # Запрет на PUT
+
+# Управление поставщиками (администратор)
+class AdminSupplierViewSet(viewsets.ModelViewSet):
+    queryset = Supplier.objects.all()
+    serializer_class = serializers.Serializer  # Нужно создать SupplierSerializer
+    permission_classes = [IsAdminUser]
+
+# Управление всеми заказами (администратор)
+class AdminOrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsAdminUser]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['user__email', 'status']
+
+    @action(detail=True, methods=['patch'])
+    def update_status(self, request, pk=None):
+        order = self.get_object()
+        new_status = request.data.get('status')
+                
+        if not new_status or new_status not in dict(Order.Status.choices):
+            return Response({'error': 'Неверный статус'}, 
+                          status=status.HTTP_400_BAD_REQUEST)
+            
+        order.status = new_status
+        order.save()
+        
+        if new_status == Order.Status.COMPLETED:
+            self.send_completion_email(order)
+            
+        return Response(OrderSerializer(order).data)
+
+## Пользователи
 # Товары
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
@@ -105,27 +154,6 @@ class OrderViewSet(viewsets.ModelViewSet):
         self.send_confirmation_email(order)
         
         return Response({'status': 'Заказ подтвержден'}, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['patch'])
-    def update_status(self, request, pk=None):
-        if not request.user.is_staff:
-            return Response({'error': 'Только администратор может изменять статус'}, 
-                          status=status.HTTP_403_FORBIDDEN)
-        
-        order = self.get_object()
-        new_status = request.data.get('status')
-        
-        if not new_status or new_status not in dict(Order.Status.choices):
-            return Response({'error': 'Неверный статус'}, 
-                          status=status.HTTP_400_BAD_REQUEST)
-            
-        order.status = new_status
-        order.save()
-        
-        if new_status == Order.Status.COMPLETED:
-            self.send_completion_email(order)
-            
-        return Response(OrderSerializer(order).data)
 
 # Заменим вызовы send_mail на асинхронные задачи
     def send_order_email(self, order):

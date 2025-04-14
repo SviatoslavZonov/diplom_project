@@ -254,7 +254,16 @@ python manage.py import_products
 Примеры запросов с описанием в файле [requests-examples.http](./app/requests-examples.http).
 
 ## Этап 6. Реализация API views админки склада
-Реализованы API views для страниц админки сервиса.
+API для администраторов
+
+| Эндпоинт                 | Метод   | Описание                          | Права       |
+|  :---  |  :---:  |  :---  |  :---:  |
+| `/api/admin/users/`      | GET     | Список всех пользователей        | Только админ|
+| `/api/admin/suppliers/`  | POST    | Создание поставщика              | Только админ|
+| `/api/admin/orders/`     | GET     | Список всех заказов              | Только админ|
+| `/api/admin/orders/{id}/update_status/` | PATCH | Изменение статуса заказа | Только админ|
+
+Примеры запросов с описанием в файле [requests-examples_admin.http](./app/requests-examples_admin.http).
 
 ## Этап 7. Вынос медленных методов в задачи Celery
 1. Создано Celery-приложение c методами:
