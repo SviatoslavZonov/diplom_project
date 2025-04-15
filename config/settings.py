@@ -21,13 +21,20 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',  # необходимо для allauth
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_spectacular', # добавим генерацию документации DRF-Spectacular
     'corsheaders',
     'app',  # Мое приложение
     'rest_framework_simplejwt', # добавим библиотеку для возврата токена при авторизации
+    'allauth', # добавим авторизацию через соц.сети с помощью django-allauth
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
+
+SITE_ID = 1  # ID сайта (обычно 1 - дефолт)
 
 # Промежуточное ПО
 MIDDLEWARE = [
@@ -39,6 +46,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware', 
 ]
 
 # кастомная модель
@@ -163,6 +171,22 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Документация API сервиса заказа товаров',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+}
+
+# Настройки django-allauth для в авторизации через соц.сети
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': 'YOUR_GOOGLE_CLIENT_ID',
+            'secret': 'YOUR_GOOGLE_SECRET',
+            'key': ''
+        }
+    }
 }
 
 # CORS, если будет фронтенд на отдельном домене
