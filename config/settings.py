@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_spectacular', # добавим генерацию документации DRF-Spectacular
     'corsheaders',
     'app',  # Мое приложение
     'rest_framework_simplejwt', # добавим библиотеку для возврата токена при авторизации
@@ -130,6 +131,16 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema', # drf spectacular
+    # настройки тротлинга
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '20/day', # для незарегистрированного пользователя не более 20 запросов а день
+        'user': '100/day' # для зарегистрированного пользователя не более 100 запросов в день
+    }
 }
 
 # JWT Settings
@@ -145,6 +156,14 @@ SIMPLE_JWT = {
 CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Локальный Redis
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_TASK_DEFAULT_QUEUE = 'default'
+
+# Настройки SPECTACULAR
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API для автоматизации закупок',
+    'DESCRIPTION': 'Документация API сервиса заказа товаров',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 # CORS, если будет фронтенд на отдельном домене
 CORS_ALLOW_ALL_ORIGINS = True  # Для разработки, в продакшене указать конкретные домены

@@ -300,7 +300,8 @@ docker-compose exec web python manage.py createsuperuser
 docker-compose down
 
 ## Дополнительные этапы
-Покрыть не менне 30% модуля views.py тестами и проверить это пакетом coverage.
+# A. Покрыть не менне 30% модуля views.py тестами и проверить это пакетом coverage.
+
 1. Установите зависимости
 pip install pytest pytest-django coverage django-celery-beat
 2. Пропишем тесты в файле tests/test_views.py
@@ -308,11 +309,22 @@ pip install pytest pytest-django coverage django-celery-beat
 coverage run --source='app' -m pytest app/tests/test_views.py -v --ds=config.settings
 coverage report -m
 
-Результат:
-app\views.py                                   146     53    64%   29-31, 56-69, 87, 93-95, 98-100, 108, 111, 120, 123-140, 144-156, 160-162, 165-167, 170-172, 222, 
-228-230
---------------------------------------------------------------------------
-TOTAL                                          452    106    77%
+Результат для views.py:
+| Name |                                        | Stmts |  Miss | Cover |  Missing |
+|  :---  |  :---:  |  :---  |  :---:  |
+| app\views.py                                   | 146  |   53  |  64% |  29-31, 56-69, 87, 93-95, 98-100, 108, 111, 120, 123-140, 144-156, 160-162, 165-167, 170-172, 222, 
+228-230 |
+| TOTAL  |                                      |  452  |  106  |  77% |
+
+# B. Генерация документации Open API с помощью DRF-Spectacular
+1. Установите зависимости
+pip install drf-spectacular
+2. Провести настройку файлов в папке config: settings.py и urls.py.
+Для проверки:
+Откройте http://localhost:8000/api/docs/ — Swagger UI отобразит все эндпоинты.
+
+# C. Троттлинг
+Проведем настройку файлов в папке config settings.py
 
 
 # Коммиты оставляю поэтапно в Git, параллельно с доработкой и исправлениями в readme.md
