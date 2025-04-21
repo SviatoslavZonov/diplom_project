@@ -333,6 +333,19 @@ pip install django-allauth cryptography
 3. Примените миграции:
 python manage.py migrate
 
+## E. Кастомизация админ.панели с Django Baton
+1. Установите зависимости
+pip install django-baton
+2. Провести настройку файлов в папке config: settings.py. Добавим маршруты в urls.py.
+3. Выполните миграции: 
+python manage.py migrate
+4. соберите статические файлы
+python manage.py collectstatic
+5. Запустите сервер для проверки:
+python manage.py runserver
+Возможны конфликты со стороны allauth при аутентификации, так как по умолчанию использует username. Кастомная модель пользователя CustomUser не имеет поля username, но система аутентификации пытается его использовать. Поэтому сделаем кастомный бэкенд аутентификации backends.py и форму входа в админке admin_forms.py отдельно, чтобы стандартные формы Django Admin также прогружались.
+
+
 # Коммиты оставляю поэтапно в Git, параллельно с доработкой и исправлениями в readme.md
 
 ## Требования

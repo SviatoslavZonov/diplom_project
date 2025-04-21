@@ -16,6 +16,7 @@ ALLOWED_HOSTS = ['*']
 
 # Установленные приложения
 INSTALLED_APPS = [
+    'baton', # панель django-baton
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,6 +33,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'baton.autodiscover'
 ]
 
 SITE_ID = 1  # ID сайта (обычно 1 - дефолт)
@@ -48,9 +50,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware', 
 ]
-
-# кастомная модель
-AUTH_USER_MODEL = 'app.CustomUser'
 
 # Корневой URL-конфиг
 ROOT_URLCONF = 'config.urls'
@@ -98,6 +97,32 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Настройки панели django-baton
+BATON = {
+    'SITE_HEADER': 'Админ-панель автоматизации закупок',
+    'SITE_TITLE': 'Закупки',
+    'INDEX_TITLE': 'Управление данными',
+    'MENU': [
+        {
+            'label': 'Пользователи и поставщики',
+            'items': [
+                {'model': 'app.CustomUser'},
+                {'model': 'app.Supplier'},
+            ]
+        },
+        {
+            'label': 'Товары и заказы',
+            'items': [
+                {'model': 'app.Product'},
+                {'model': 'app.Order'},
+                {'model': 'app.Cart'},
+                {'model': 'app.Contact'},
+            ]
+        },
+    ],
+    'SUPPORT_HREF': 'https://github.com/your-repo',  # Ссылка на поддержку
+}
 
 # Интернационализация
 LANGUAGE_CODE = 'ru-ru'
@@ -173,19 +198,28 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
+# кастомная модель
+AUTH_USER_MODEL = 'app.CustomUser'
+
 # Настройки django-allauth для в авторизации через соц.сети
+ACCOUNT_LOGIN_METHODS = ["email"]  # Вход только через email
+ACCOUNT_SIGNUP_FIELDS = ["email"]  # Обязательные поля при регистрации
+ACCOUNT_UNIQUE_EMAIL = True         # Уникальность email
+
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',  # Для allauth
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': 'YOUR_GOOGLE_CLIENT_ID',
-            'secret': 'YOUR_GOOGLE_SECRET',
-            'key': ''
-        }
+    "google": {
+        "APP": {
+            "client_id": "ВАШ_REAL_CLIENT_ID",
+            "secret": "ВАШ_REAL_SECRET",
+        },
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
     }
 }
 

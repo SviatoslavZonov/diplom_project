@@ -22,7 +22,7 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractUser):
     username = None
-    email = models.EmailField(unique=True)
+    email = models.EmailField("Email", unique=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 

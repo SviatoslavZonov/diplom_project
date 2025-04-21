@@ -3,10 +3,12 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from django.conf.urls import include
 
 urlpatterns = [
     # Админка Django
     path('admin/', admin.site.urls),
+    path('baton/', include('baton.urls')),
     # API версии 1
     path('api/', include('app.urls')),  # Префикс v1/ уберем
     # path('api/v1/', include('app.urls')),  # Префикс api/v1/ остается
