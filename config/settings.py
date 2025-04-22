@@ -11,6 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'ваш_секретный_ключ'
 
 # Режим отладки (в продакшене установить DEBUG = False)
+INTERNAL_IPS = ['127.0.0.1']
 DEBUG = True
 
 # Разрешенные хосты (укажите свои домены или IP)
@@ -19,6 +20,8 @@ ALLOWED_HOSTS = ['*']
 # Установленные приложения
 INSTALLED_APPS = [
     'baton', # панель django-baton
+    'cachalot', # django-cachalot
+    'debug_toolbar', # визуализация в админке
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +47,7 @@ SITE_ID = 1  # ID сайта (обычно 1 - дефолт)
 # Промежуточное ПО
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -239,6 +243,23 @@ SOCIALACCOUNT_PROVIDERS = {
         "AUTH_PARAMS": {"access_type": "online"},
     }
 }
+
+# Нвстройки Redis 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379/1",  # БД 1 для кэша
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+        },
+        "KEY_PREFIX": "myapp_cache",  # Префикс ключей
+    }
+}
+
+# Настройки django-cachalot
+CACHALOT_ENABLED = True
+CACHALOT_TIMEOUT = 60 * 15  # 15 минут
 
 # CORS, если будет фронтенд на отдельном домене
 CORS_ALLOW_ALL_ORIGINS = True  # Для разработки, в продакшене указать конкретные домены

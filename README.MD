@@ -359,6 +359,24 @@ pip install sentry-sdk
 3. Проведем тестовый запрос и добавим эндпоинт в urls. 
 Ошибка должна отобразиться в профиле Sentry на sentry.io
 
+## H. Кэширование с помощью Redis и с помощью django-cachalot измерим производительность 
+1. Установите зависимости
+pip install django-redis django-cachalot
+2. Проверьте настройки Redis в Django и проведите интеграцию django-cachalot.
+3. Проверка работы
+http://localhost:8000/api/cache-test/
+Ответ json:
+{
+  "db_response_time": 0.1254,
+  "cached_response_time": 0.0021,
+  "speedup": "98.3%"
+}
+4. Сделаем визуализация в Django Admin django-debug-toolbar
+4. 1. Установите зависимости
+    pip install django-debug-toolbar
+4. 2. Провести настройку файлов согласно репозитория.
+
+
 # Коммиты оставляю поэтапно в Git, параллельно с доработкой и исправлениями в readme.md
 
 ## Требования

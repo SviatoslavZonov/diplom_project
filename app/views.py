@@ -1,4 +1,5 @@
 import os
+import time
 import sentry_sdk
 from rest_framework import viewsets, generics, status, permissions, serializers
 from rest_framework.permissions import IsAdminUser
@@ -270,3 +271,22 @@ class SentryTestView(APIView):
                 {"error": "Тестовая ошибка залогирована в Sentry"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+# Тестовый эндпоинт для замера производительности 
+class CacheTestView(APIView):
+    def get(self, request):
+        # Замер без кэша
+        start_time = time.time()
+        products = list(Product.objects.all())
+        db_time = time.time() - start_time
+        
+        # Замер с кэшем (повторный запрос)
+        start_time = time.time()
+        cached_products = list(Product.objects.all())
+        cache_time = time.time() - start_time
+
+        return Response({
+            "db_response_time": round(db_time, 4),
+            "cached_response_time": round(cache_time, 4),
+            "speedup": f"{round((db_time - cache_time)/db_time * 100, 1)}%"
+        })

@@ -9,13 +9,13 @@ from .views import (
     ContactViewSet,
     OrderViewSet,
     OrderHistoryView,
-    product_list
+    product_list,
+    SentryTestView,
+    CacheTestView
 )
 from .views import AdminUserViewSet, AdminSupplierViewSet, AdminOrderViewSet
 from django.conf import settings
 from django.conf.urls.static import static
-
-from .views import SentryTestView
 
 app_name = 'app'
 
@@ -49,6 +49,9 @@ urlpatterns = [
     
     # отображение страницы с товарами
     path('products/', product_list, name='product-list'),
+    
+    # Эндпоинт для теста производительности БД
+    path('cache-test/', CacheTestView.as_view(), name='cache-test'),
 
     # Подключаем все зарегистрированные ViewSets
     path('', include(router.urls)),  # Исправлено: убран префикс api/
