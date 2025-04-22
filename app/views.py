@@ -1,4 +1,5 @@
 import os
+import sentry_sdk
 from rest_framework import viewsets, generics, status, permissions, serializers
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -245,3 +246,27 @@ class AdminViewSet(viewsets.ViewSet):
         path = os.path.join(settings.BASE_DIR, 'data')
         do_import.delay(path)  # Асинхронный запуск
         return Response({"status": "Импорт запущен"}, status=200)
+
+# Sentry, тестовый эндпоинт для генерации ошибки
+class SentryTestView(APIView):
+    def get(self, request):
+        try:
+            # Генерируем цепочку исключений
+            result = 1 / 0
+        except ZeroDivisionError as e:
+            # Добавляем кастомный контекст
+            with sentry_sdk.configure_scope() as scope:
+                scope.set_tag("test_tag", "sentry_debug")
+                scope.set_extra("debug_info", {
+                    "user": str(request.user),
+                    "path": request.path
+                })
+            
+            # Логируем через Sentry
+            sentry_sdk.capture_exception(e)
+            
+            # Возвращаем кастомный ответ
+            return Response(
+                {"error": "Тестовая ошибка залогирована в Sentry"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

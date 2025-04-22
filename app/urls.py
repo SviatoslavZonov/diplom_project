@@ -15,6 +15,8 @@ from .views import AdminUserViewSet, AdminSupplierViewSet, AdminOrderViewSet
 from django.conf import settings
 from django.conf.urls.static import static
 
+from .views import SentryTestView
+
 app_name = 'app'
 
 router = DefaultRouter()
@@ -41,6 +43,9 @@ urlpatterns = [
 
     # Эндпоинты для заказов
     path('orders/history/', OrderHistoryView.as_view(), name='order-history'),
+    
+    # Эндпоинты для Sentry
+    path('sentry-test/', SentryTestView.as_view(), name='sentry-test'),
     
     # отображение страницы с товарами
     path('products/', product_list, name='product-list'),

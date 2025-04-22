@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 from datetime import timedelta
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Базовая директория проекта
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -124,6 +126,20 @@ BATON = {
     ],
     'SUPPORT_HREF': 'https://github.com/your-repo',  # Ссылка на поддержку
 }
+
+# Настройки Sentry (логирование ошибок). Получаем DSN из переменных окружения
+SENTRY_DSN = os.getenv("SENTRY_DSN")
+
+if SENTRY_DSN:  # Инициализируем только если DSN указан
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0,
+        send_default_pii=True,
+        environment="development" if DEBUG else "production",
+        release="v1.0.0",
+        before_send=lambda event, hint: None if DEBUG else event,  # Игнорируем ошибки в DEBUG
+    )
 
 # Интернационализация
 LANGUAGE_CODE = 'ru-ru'
