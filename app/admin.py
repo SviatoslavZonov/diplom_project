@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django import forms
-from .models import CustomUser
+from .models import CustomUser, Product
 
 # Кастомная форма аутентификации для админки
 class CustomAdminAuthForm(AdminAuthenticationForm):
@@ -23,3 +23,16 @@ class CustomUserAdmin(UserAdmin):
     )
     list_display = ("email", "first_name", "last_name", "is_staff")
     ordering = ("email",)
+
+# Модель Product для загрузки изображений
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('name', 'supplier', 'price')
+    readonly_fields = ('thumbnail_preview',)  # Покажет превью миниатюры
+
+    def thumbnail_preview(self, obj):
+        if obj.thumbnail:
+            return obj.thumbnail.url
+        return "Нет изображения"
+    
+    thumbnail_preview.short_description = "Миниатюра"

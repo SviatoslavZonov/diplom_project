@@ -11,6 +11,9 @@ from .views import (
     OrderHistoryView
 )
 from .views import AdminUserViewSet, AdminSupplierViewSet, AdminOrderViewSet
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 app_name = 'app'
 
@@ -41,4 +44,4 @@ urlpatterns = [
     
     # Подключаем все зарегистрированные ViewSets
     path('', include(router.urls)),  # Исправлено: убран префикс api/
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

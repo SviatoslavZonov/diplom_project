@@ -19,6 +19,15 @@ from .serializers import (
 )
 from app.tasks import send_email, do_import
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .tasks import generate_image_thumbnails
+
+@receiver(post_save, sender=Product)
+def process_product_image(sender, instance, **kwargs):
+    if instance.image:
+        generate_image_thumbnails.delay(instance.id)
+
 User = get_user_model()
 
 ## Админмстраторы

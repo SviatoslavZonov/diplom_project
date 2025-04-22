@@ -5,6 +5,9 @@ from django.utils.translation import gettext_lazy as _
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
+from imagekit.models import ProcessedImageField, ImageSpecField 
+from imagekit.processors import ResizeToFill
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -63,6 +66,22 @@ class Product(models.Model):
     quantity = models.PositiveIntegerField(_("Количество"), default=0)
     created_at = models.DateTimeField(_("Дата создания"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Дата обновления"), auto_now=True)
+
+    image = ProcessedImageField(
+        upload_to='products/',
+        processors=[ResizeToFill(800, 600)],  # Размер изображения
+        format='JPEG',                        # Формат
+        options={'quality': 90},              # Качество
+        blank=True,
+        null=True
+    )
+    # Миниатюра (автоматически генерируется из основного изображения)
+    thumbnail = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(200, 200)],
+        format='JPEG',
+        options={'quality': 70}
+    )
 
     class Meta:
         verbose_name = _("Товар")

@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular', # добавим генерацию документации DRF-Spectacular
     'corsheaders',
+    'imagekit', # django-imagekit для загрузки изображений и создания миниатюр
     'app',  # Мое приложение
     'rest_framework_simplejwt', # добавим библиотеку для возврата токена при авторизации
     'allauth', # добавим авторизацию через соц.сети с помощью django-allauth
