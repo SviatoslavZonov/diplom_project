@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator
@@ -47,6 +48,12 @@ class Supplier(models.Model):
     def __str__(self):
         return self.name
 
+# функция для генерации уникальных имен файлов в Product
+def get_file_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"{uuid.uuid4()}.{ext}"
+    return f"products/{filename}"
+
 class Product(models.Model):
     name = models.CharField(_("Название"), max_length=100)
     description = models.TextField(_("Описание"), blank=True)
@@ -68,10 +75,10 @@ class Product(models.Model):
     updated_at = models.DateTimeField(_("Дата обновления"), auto_now=True)
 
     image = ProcessedImageField(
-        upload_to='products/',
-        processors=[ResizeToFill(800, 600)],  # Размер изображения
-        format='JPEG',                        # Формат
-        options={'quality': 90},              # Качество
+        upload_to=get_file_path,  # Уникальные имена файлов
+        processors=[ResizeToFill(800, 600)],
+        format='JPEG',
+        options={'quality': 90},
         blank=True,
         null=True
     )

@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.shortcuts import render
 from .models import CustomUser, Product, Cart, Contact, Order, OrderItem, Supplier
 from .serializers import (
     ProductSerializer, CartSerializer,
@@ -23,12 +24,19 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .tasks import generate_image_thumbnails
 
+from django.shortcuts import render
+
 @receiver(post_save, sender=Product)
 def process_product_image(sender, instance, **kwargs):
     if instance.image:
         generate_image_thumbnails.delay(instance.id)
 
 User = get_user_model()
+
+# список продуктов
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, 'products/list.html', {'products': products})
 
 ## Админмстраторы
 # запуск импорта через API асинхронно

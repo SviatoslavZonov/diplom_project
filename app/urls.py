@@ -8,12 +8,12 @@ from .views import (
     CartViewSet,
     ContactViewSet,
     OrderViewSet,
-    OrderHistoryView
+    OrderHistoryView,
+    product_list
 )
 from .views import AdminUserViewSet, AdminSupplierViewSet, AdminOrderViewSet
 from django.conf import settings
 from django.conf.urls.static import static
-
 
 app_name = 'app'
 
@@ -42,6 +42,9 @@ urlpatterns = [
     # Эндпоинты для заказов
     path('orders/history/', OrderHistoryView.as_view(), name='order-history'),
     
+    # отображение страницы с товарами
+    path('products/', product_list, name='product-list'),
+
     # Подключаем все зарегистрированные ViewSets
     path('', include(router.urls)),  # Исправлено: убран префикс api/
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
