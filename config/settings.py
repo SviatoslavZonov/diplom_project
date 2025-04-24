@@ -81,11 +81,23 @@ TEMPLATES = [
 # WSGI-приложение
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# База данных (по умолчанию SQLite)
+# # База данных (по умолчанию SQLite для тестирования)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# База данных (POSTGRES для production)
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'mydb'),
+        'USER': os.getenv('POSTGRES_USER', 'admin'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
+        'HOST': 'db',  # Имя сервиса из docker-compose.yml
+        'PORT': 5432,
     }
 }
 
@@ -227,6 +239,10 @@ ACCOUNT_LOGIN_METHODS = ["email"]  # Вход только через email
 ACCOUNT_SIGNUP_FIELDS = ["email"]  # Обязательные поля при регистрации
 ACCOUNT_UNIQUE_EMAIL = True         # Уникальность email
 
+ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Вход по email, а не username
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -248,17 +264,17 @@ SOCIALACCOUNT_PROVIDERS = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://localhost:6379/1",  # БД 1 для кэша
+        "LOCATION": "redis://redis:6379/1",  # Используем имя сервиса "redis"
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
         },
-        "KEY_PREFIX": "myapp_cache",  # Префикс ключей
+        "KEY_PREFIX": "myapp_cache",
     }
 }
 
 # Настройки django-cachalot
-CACHALOT_ENABLED = True
+CACHALOT_ENABLED = False  # Отключить кэширование во время миграций
+# CACHALOT_ENABLED = True
 CACHALOT_TIMEOUT = 60 * 15  # 15 минут
 
 # CORS, если будет фронтенд на отдельном домене
