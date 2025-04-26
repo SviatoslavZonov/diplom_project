@@ -65,7 +65,7 @@ SENTRY_DSN=ваш_DSN
 docker-compose up -d --build
 ```
 1. Сервер доступен по адресу: [https://localhost/](http://localhost:8000)
-2. Ознакомьтесь с этапами разработки: [Этапы](https://github.com/netology-code/python-final-diplom/DEVELOPMENT_STAGES.md)
+2. Ознакомьтесь с этапами разработки: [Этапы](https://github.com/SviatoslavZonov/diplom_project/blob/main/DEVELOPMENT_STAGES.md)
 
 ### Тестирование
 ```bash
