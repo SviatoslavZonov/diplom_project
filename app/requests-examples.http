@@ -98,8 +98,8 @@ Authorization: Bearer {{"token"}}
 
 
 # Подтверждение заказа
-POST {{baseUrl}}/api/orders/("ID заказа")/confirm/
-
+POST {{baseUrl}}/api/orders/1/confirm/
+# POST {{baseUrl}}/api/orders/("ID заказа")/confirm/
 # Проверка: Статус: 200 OK. 
 # GET {{base_url}}/api/orders/1/ → Статус заказа должен быть processing.
 # Проверьте почту — письмо о подтверждении.

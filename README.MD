@@ -48,7 +48,7 @@ Backend-приложение для автоматизации закупок в
 1. Клонируйте репозиторий:
 ```bash
    git clone https://github.com/SviatoslavZonov/diplom_project.git
-   cd diploma_shop
+   cd diplom_project
 ```
 
 2. Заполните .env (пример).
@@ -76,13 +76,13 @@ docker-compose exec web pytest app/tests/ -v
 ### Документация API
 Swagger: [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
 
-Примеры запросов: [requests-examples.http](https://github.com/SviatoslavZonov/diplom_project/blob/main/app/requests-examples.http)
-Примеры запросов для проверки администрирования: [requests-examples_admin.http](https://github.com/SviatoslavZonov/diplom_project/blob/main/app/requests-examples_admin.http)
+Примеры запросов: [requests-examples.http](https://github.com/SviatoslavZonov/diplom_project/blob/main/app/requests-examples.http).
+Примеры запросов для проверки администрирования: [requests-examples_admin.http](https://github.com/SviatoslavZonov/diplom_project/blob/main/app/requests-examples_admin.http).
 
 ### Контакты
 - Автор: Sviatoslav Zonov
 - Email: sviatoslavzonov@yandex.ru
-- GitHub: [SviatoslavZonov](khttps://github.com/SviatoslavZonov)
+- GitHub: [SviatoslavZonov](https://github.com/SviatoslavZonov)
 
 Ссылка на задание дипломного проекта: [Диплом](https://github.com/netology-code/python-final-diplom)
 

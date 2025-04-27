@@ -180,7 +180,7 @@ EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465  # Для SSL
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'test1234API@yandex.ru'     # Полный email, нужно разрешить доступ к почтовому ящику с помощью почтовых клиентов в яндексе
-EMAIL_HOST_PASSWORD = '***********'      # Пароль от почты приложения для яндекс айди, SMTP
+EMAIL_HOST_PASSWORD = 'zacrgeogupwyypod'      # Пароль от почты приложения для яндекс айди, SMTP
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # REST Framework

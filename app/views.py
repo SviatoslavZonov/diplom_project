@@ -18,7 +18,7 @@ from .models import CustomUser, Product, Cart, Contact, Order, OrderItem, Suppli
 from .serializers import (
     ProductSerializer, CartSerializer,
     ContactSerializer, OrderSerializer,
-    LoginSerializer, RegisterSerializer
+    LoginSerializer, RegisterSerializer, SupplierSerializer
 )
 from app.tasks import send_email, do_import
 
@@ -59,7 +59,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
 # Управление поставщиками (администратор)
 class AdminSupplierViewSet(viewsets.ModelViewSet):
     queryset = Supplier.objects.all()
-    serializer_class = serializers.Serializer  # Нужно создать SupplierSerializer
+    serializer_class = SupplierSerializer # Нужно создать SupplierSerializer
     permission_classes = [IsAdminUser]
 
 # Управление всеми заказами (администратор)

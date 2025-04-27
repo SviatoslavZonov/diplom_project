@@ -1,3 +1,4 @@
+from asyncio.log import logger
 from celery import shared_task
 from django.core.mail import send_mail
 from django.conf import settings
@@ -22,8 +23,9 @@ def do_import(path):
 
 @shared_task
 def generate_image_thumbnails(product_id):
-    product = Product.objects.get(id=product_id)
-    
-    # Принудительно генерируем миниатюру
-    cache = get_cache()
-    cache.generate(product.thumbnail)
+    try:
+        product = Product.objects.get(id=product_id)
+        cache = get_cache() # Принудительно генерируем миниатюру
+        cache.generate(product.thumbnail)
+    except Product.DoesNotExist:
+        logger.error(f"Product {product_id} not found")

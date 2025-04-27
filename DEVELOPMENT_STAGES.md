@@ -292,7 +292,7 @@ python manage.py collectstatic
 python manage.py runserver
 ```
 Откройте админ-панель: http://localhost:8000/admin/
-6. Решение конфликтов allauth с кастомной моделью пользователя реализование через файлы app/backends.py и app/admin_forms.py
+6. Решение конфликтов allauth с кастомной моделью пользователя реализовано через файлы **app/backends.py** и **app/admin_forms.py**
 
 ## F. Cоздание миниатюр различного размера для быстрой загрузки через django-imagekit
 1. Установка зависимостей
