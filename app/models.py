@@ -66,10 +66,9 @@ class Product(models.Model):
     )
     characteristics = models.JSONField(_("Характеристики"), default=dict)
     price = models.DecimalField(
-        _("Цена"),
         max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(0.01)]
+        validators=[MinValueValidator(Decimal('0.01'))]  # Используем Decimal
     )
     quantity = models.PositiveIntegerField(_("Количество"), default=0)
     created_at = models.DateTimeField(_("Дата создания"), auto_now_add=True)

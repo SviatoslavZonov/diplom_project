@@ -64,8 +64,15 @@ SENTRY_DSN=ваш_DSN
 ```bash
 docker-compose up -d --build
 ```
-1. Сервер доступен по адресу: [https://localhost/](http://localhost:8000)
-2. Ознакомьтесь с этапами разработки: [Этапы](https://github.com/SviatoslavZonov/diplom_project/blob/main/DEVELOPMENT_STAGES.md)
+
+ При запуске будут выполнены миграции базы данных, создан суперпользователь с тестовыми почтой admin1234@example.com и паролем admin, собраны статические файлы и развернуты все контейнеры: Django, PostgreSQL, Celery, Redis и тд.
+
+4. После запуска сервер будет доступен:
+   Адрес: [localhost](http://localhost:8000)
+   API: [API](http://localhost:8000/api/)
+   Панель администратора: [Admin](http://localhost:8000/admin/)
+   
+5. Ознакомьтесь с этапами разработки: [Этапы](https://github.com/SviatoslavZonov/diplom_project/blob/main/DEVELOPMENT_STAGES.md)
 
 ### Тестирование
 ```bash

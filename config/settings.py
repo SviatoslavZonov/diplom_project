@@ -193,20 +193,21 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema', # drf spectacular
-    
+
     # настройки тротлинга
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '3/minute',
-        'user': '5/minute'
+        'anon': '3/minute',  # Лимит для анонимных (вместо 3/minute)
+        'user': '5/minute',  # Лимит для авторизованных (вместо 5/minute)
     }
 }
 
@@ -220,9 +221,21 @@ SIMPLE_JWT = {
 }
 
 # Настройки Celery
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Локальный Redis
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://redis:6379/0'  # Локальный Redis
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 CELERY_TASK_DEFAULT_QUEUE = 'default'
+
+# Настройки Redis 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",    
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "KEY_PREFIX": "myapp_cache"            # префикс ключей
+    }
+}
 
 # Настройки SPECTACULAR
 SPECTACULAR_SETTINGS = {
@@ -230,18 +243,6 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Документация API сервиса заказа товаров',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-}
-
-# Настройки Redis 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis:6379/1",  # БД 1 
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
-        "KEY_PREFIX": "myapp_cache"  # Префикс ключей
-    }
 }
 
 # кастомная модель
