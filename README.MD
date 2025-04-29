@@ -89,7 +89,7 @@ Swagger: [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
 Ссылка на задание дипломного проекта: [Диплом](https://github.com/netology-code/python-final-diplom)
 
 ## Требования
-ОС Linux, MacOS, Windows 10 (WSL)
-Python 3.10+
-Django 4.2+
-Поддерживаемые СУБД: SQLite/PostgreSQL/MySQL
+- ОС **Linux**, **MacOS**, **Windows 10 (WSL)**
+- **Python 3.10+**
+- **Django 4.2+**
+- Поддерживаемые СУБД: **SQLite/PostgreSQL/MySQL**
