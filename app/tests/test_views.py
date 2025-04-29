@@ -3,22 +3,25 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from app.models import Product, Supplier, Cart, Contact, Order
+import time
+
+from unittest.mock import patch
+from app.tasks import send_email
 
 User = get_user_model()
 
 class AuthTests(APITestCase):
-    def test_register(self):
-        url = reverse("app:register")
+    @patch('app.tasks.send_email.delay')
+    def test_register(self, mock_send_email):
         data = {
-            "email": "test@example.com",
-            "password": "SecurePass123!",
-            "first_name": "Test",
-            "last_name": "User"
+            'email': 'test@example.com',
+            'password': 'testpassword123',
+            'first_name': 'Test',
+            'last_name': 'User'
         }
-        response = self.client.post(url, data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(User.objects.filter(email="test@example.com").exists())
-
+        response = self.client.post('/auth/register/', data)
+        self.assertEqual(response.status_code, 201)
+        mock_send_email.assert_called_once()
     def test_login(self):
         User.objects.create_user(email="test@example.com", password="SecurePass123!")
         url = reverse("app:token_obtain_pair")
@@ -32,19 +35,13 @@ class AuthTests(APITestCase):
 
 class ProductViewSetTests(APITestCase):
     def setUp(self):
-        self.supplier = Supplier.objects.create(name="Test Supplier")
-        self.product = Product.objects.create(
-            name="Test Product",
-            supplier=self.supplier,
-            price=100.00,
-            quantity=10
-        )
+        supplier = Supplier.objects.create(name="Test Supplier")
+        Product.objects.create(name="Test Product", price=100, supplier=supplier)
 
     def test_list_products(self):
-        url = reverse("app:product-list")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["results"]), 1)
+        response = self.client.get('/products/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
 
 class CartViewSetTests(APITestCase):
     def setUp(self):

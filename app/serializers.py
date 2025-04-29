@@ -2,6 +2,8 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from app.models import Product, Cart, Contact, Order, OrderItem, Supplier
 
+from django.core.validators import MinValueValidator
+
 User = get_user_model()
 
 # Сериализатор для поставщиков (админ)
@@ -83,20 +85,24 @@ class CartSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
     product_id = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.all(),
-        source='product',
+        source="product",
         write_only=True
+    )
+    quantity = serializers.IntegerField(  # Явно указываем тип
+        default=1,
+        validators=[MinValueValidator(1)]  # меняем валидатор
     )
 
     class Meta:
         model = Cart
         fields = [
-            'id',
-            'product',
-            'product_id',
-            'quantity',
-            'created_at'
+            "id",
+            "product",
+            "product_id",
+            "quantity",
+            "created_at"
         ]
-        read_only_fields = ['created_at']
+        read_only_fields = ["created_at"]
 
     def validate_quantity(self, value):
         if value < 1:

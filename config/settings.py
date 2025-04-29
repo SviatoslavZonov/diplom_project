@@ -198,14 +198,15 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FormParser',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema', # drf spectacular
+    
     # настройки тротлинга
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '20/day', # для незарегистрированного пользователя не более 20 запросов а день
-        'user': '100/day' # для зарегистрированного пользователя не более 100 запросов в день
+        'anon': '3/minute',
+        'user': '5/minute'
     }
 }
 
@@ -229,6 +230,18 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Документация API сервиса заказа товаров',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+}
+
+# Настройки Redis 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",  # БД 1 
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "KEY_PREFIX": "myapp_cache"  # Префикс ключей
+    }
 }
 
 # кастомная модель
@@ -257,18 +270,6 @@ SOCIALACCOUNT_PROVIDERS = {
         },
         "SCOPE": ["profile", "email"],
         "AUTH_PARAMS": {"access_type": "online"},
-    }
-}
-
-# Нвстройки Redis 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis:6379/1",  # Используем имя сервиса "redis"
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
-        "KEY_PREFIX": "myapp_cache",
     }
 }
 

@@ -9,7 +9,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -28,6 +28,8 @@ from .tasks import generate_image_thumbnails
 
 from django.shortcuts import render
 
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
+
 @receiver(post_save, sender=Product)
 def process_product_image(sender, instance, **kwargs):
     if instance.image:
@@ -35,10 +37,18 @@ def process_product_image(sender, instance, **kwargs):
 
 User = get_user_model()
 
-# список продуктов
+
+# тест списка продуктов через DRF
+@api_view(['GET'])
 def product_list(request):
     products = Product.objects.all()
-    return render(request, 'products/list.html', {'products': products})
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)
+
+# # список продуктов
+# def product_list(request):
+#     products = Product.objects.all()
+#     return render(request, 'products/list.html', {'products': products})
 
 ## Админмстраторы
 # запуск импорта через API асинхронно
@@ -90,6 +100,7 @@ class AdminOrderViewSet(viewsets.ModelViewSet):
 ## Пользователи
 # Товары
 class ProductViewSet(viewsets.ModelViewSet):
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]

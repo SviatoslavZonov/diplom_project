@@ -34,7 +34,7 @@ router.register(r'orders', OrderViewSet, basename='order')
 
 urlpatterns = [
     # Эндпоинты аутентификации
-    path('auth/register/', RegisterView.as_view(), name='register'),  # Исправлено: убран префикс api/
+    path('auth/register/', RegisterView.as_view(), name='register'),
     # path('auth/login/', LoginView.as_view(), name='login'),
     path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
 
@@ -54,5 +54,5 @@ urlpatterns = [
     path('cache-test/', CacheTestView.as_view(), name='cache-test'),
 
     # Подключаем все зарегистрированные ViewSets
-    path('', include(router.urls)),  # Исправлено: убран префикс api/
+    path('', include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
