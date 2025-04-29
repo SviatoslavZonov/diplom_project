@@ -11,7 +11,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'ваш_секретный_ключ'
 
 # Режим отладки (в продакшене установить DEBUG = False)
-INTERNAL_IPS = ['127.0.0.1']
+# Разрешенные IP-адреса для отображения панели
+INTERNAL_IPS = [
+    '127.0.0.1',
+    '0.0.0.0',  # Для Docker
+]
 DEBUG = True
 
 # Разрешенные хосты (укажите свои домены или IP)
@@ -290,3 +294,13 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# Для подавления предупреждений (опционально)
+STATICFILES_IGNORE_PATTERNS = [
+    'admin/css/*',  # Игнорировать конфликтующие файлы
+]
+
+# Настройки для работы через Docker debug toolbar
+DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+    }

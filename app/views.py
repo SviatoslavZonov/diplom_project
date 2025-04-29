@@ -37,7 +37,6 @@ def process_product_image(sender, instance, **kwargs):
 
 User = get_user_model()
 
-
 # тест списка продуктов через DRF
 @api_view(['GET'])
 def product_list(request):

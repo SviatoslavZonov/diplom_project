@@ -35,6 +35,8 @@ services:
       sh -c "python manage.py wait_for_db &&
              python manage.py migrate &&
              python manage.py collectstatic --noinput &&
+             python manage.py createsuperuser --noinput --email admin1234@example.com &&
+             python manage.py import_products --path /app/data &&
              gunicorn --bind 0.0.0.0:8000 config.wsgi:application"
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-admin}
@@ -42,9 +44,12 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-mydb}
       POSTGRES_HOST: db
       CELERY_BROKER_URL: redis://redis:6379/0
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD:-admin1234}
+      DEBUG: 1  # Включить режим отладки
     volumes:
       - static_volume:/app/static
       - media_volume:/app/media
+      - ./data:/app/data  # Монтируем локальную папку data в контейнер для импорта продуктов
     ports:
       - "8000:8000"
     depends_on:
