@@ -105,8 +105,3 @@ venv.bak/
 
 # static
 static/
-
-# coverage
-htmlcov/
-.coverage
-.coverage.*
