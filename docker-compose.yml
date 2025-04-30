@@ -46,6 +46,7 @@ services:
       CELERY_BROKER_URL: redis://redis:6379/0
       DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD:-admin1234}
       DEBUG: 1  # Включить режим отладки
+      ROLLBAR_ACCESS_TOKEN: ${ROLLBAR_ACCESS_TOKEN:-cf90f200ad1845b187ed0b2b183e43bdn} # Rollbar
     volumes:
       - static_volume:/app/static
       - media_volume:/app/media

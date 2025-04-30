@@ -338,11 +338,24 @@ http://localhost:8000/api/cache-test/
   "speedup": "98.3%"
 }
 ```
-4. Визуализация в Django Admin **django-debug-toolbar**
-4. 1. Установка зависимостей
+## J. Кэширование Визуализация в Django Admin **django-debug-toolbar**
+1. Установка зависимостей
 ```bash
 pip install django-debug-toolbar
 ```
-4. 2. Провести настройку файлов согласно репозитория.
-4. 3. Debug Toolbar:
+2. Провести настройку файлов согласно репозитория.
+3. Debug Toolbar:
 Откройте любую страницу проекта в браузере - Панель отладки появится справа.
+
+## K. Мониторинг и оповещение об ошибках Rollbar
+1. Установка зависимостей
+```bash
+pip install rollbar
+```
+2. Настройка Rollbar согласно репозитория библиотеки.
+3. Проверьте интеграцию:
+- Зайдите на http://localhost:8000/rollbar-test/, чтобы вызвать ошибку.
+- Откройте Rollbar Dashboard — ошибка должна отобразиться.
+  ```json
+"error": "division by zero"
+```

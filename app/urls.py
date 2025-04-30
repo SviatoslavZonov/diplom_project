@@ -11,7 +11,8 @@ from .views import (
     OrderHistoryView,
     product_list,
     SentryTestView,
-    CacheTestView
+    CacheTestView,
+    trigger_error
 )
 from .views import AdminUserViewSet, AdminSupplierViewSet, AdminOrderViewSet
 from django.conf import settings
@@ -52,6 +53,9 @@ urlpatterns = [
     
     # Эндпоинт для теста производительности БД
     path('cache-test/', CacheTestView.as_view(), name='cache-test'),
+
+    # Эндпоинт для теста rollbar
+    path('rollbar-test/', trigger_error),
 
     # Подключаем все зарегистрированные ViewSets
     path('', include(router.urls)),

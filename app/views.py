@@ -1,6 +1,7 @@
 import os
 import time
 import sentry_sdk
+import rollbar
 from rest_framework import viewsets, generics, status, permissions, serializers
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -27,6 +28,7 @@ from django.dispatch import receiver
 from .tasks import generate_image_thumbnails
 
 from django.shortcuts import render
+from django.http import HttpResponse
 
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
@@ -49,7 +51,15 @@ def product_list(request):
 #     products = Product.objects.all()
 #     return render(request, 'products/list.html', {'products': products})
 
-## Админмстраторы
+# обработкa ошибок Rollbar
+def trigger_error(request):
+    try:
+        1 / 0
+    except Exception as e:
+        rollbar.report_exc_info()
+        return HttpResponse(f"Error: {str(e)}", status=500)
+
+## Администраторы
 # запуск импорта через API асинхронно
 class AdminViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAdminUser])

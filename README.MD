@@ -23,7 +23,7 @@ Backend-приложение для автоматизации закупок в
 - **PostgreSQL** (основная БД), **Redis** (кеширование)
 - **Celery** (асинхронные задачи)
 - **Docker** (контейнеризация)
-- **Sentry** (мониторинг ошибок)
+- **Rollbar** (мониторинг ошибок)
 - **Swagger** (документация API)
 
 ## Установка и запуск
@@ -62,18 +62,18 @@ docker-compose up -d --build
   - собраны статические файлы и развернуты все контейнеры: Django, PostgreSQL, Celery, Redis и тд.
   - включен Debug toolbar.
 
-1. После запуска сервер будет доступен:
+4. После запуска сервер будет доступен:
    - Адрес: [localhost](http://localhost:8000)
    - API: [API](http://localhost:8000/api/)
    - Панель администратора: [Admin](http://localhost:8000/admin/)
    
-2. Ознакомьтесь с этапами разработки: [Этапы](https://github.com/SviatoslavZonov/diplom_project/blob/main/DEVELOPMENT_STAGES.md)
+5. Ознакомьтесь с этапами разработки: [Этапы](https://github.com/SviatoslavZonov/diplom_project/blob/main/DEVELOPMENT_STAGES.md)
 
 ### Тестирование
 ```bash
 docker-compose exec web pytest app/tests/ -v
 ```
-Покрытие кода: 77% (модуль **views.py**).
+Покрытие кода: 78% (модуль **views.py**).
 
 ### Документация API
 Swagger: [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)

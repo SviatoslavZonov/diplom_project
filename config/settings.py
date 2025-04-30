@@ -1,4 +1,5 @@
 import os
+import rollbar
 from pathlib import Path
 from datetime import timedelta
 import sentry_sdk
@@ -59,7 +60,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware', 
+    'allauth.account.middleware.AccountMiddleware',
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddleware', 
 ]
 
 # Корневой URL-конфиг
@@ -146,6 +148,17 @@ BATON = {
     ],
     'SUPPORT_HREF': 'https://github.com/your-repo',  # Ссылка на поддержку
 }
+
+# Настройки Rollbar
+ROLLBAR = {
+    'access_token': 'cf90f200ad1845b187ed0b2b183e43bd',
+    'environment': 'development' if DEBUG else 'production',
+    'code_version': '1.0',
+    'root': BASE_DIR,
+}
+
+# Инициализация Rollbar
+rollbar.init(**ROLLBAR)
 
 # Настройки Sentry (логирование ошибок). Получаем DSN из переменных окружения
 SENTRY_DSN = os.getenv("SENTRY_DSN")
