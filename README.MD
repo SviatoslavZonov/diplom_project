@@ -75,6 +75,9 @@ docker-compose exec web pytest app/tests/ -v
 ```
 Покрытие кода: 78% (модуль **views.py**).
 
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=SviatoslavZonov_diplom_project&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=SviatoslavZonov_diplom_project)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=SviatoslavZonov_diplom_project&metric=coverage)](https://sonarcloud.io/summary/new_code?id=SviatoslavZonov_diplom_project)
+
 ### Документация API
 Swagger: [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
 
