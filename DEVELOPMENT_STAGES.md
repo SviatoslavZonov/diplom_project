@@ -356,6 +356,6 @@ pip install rollbar
 3. Проверьте интеграцию:
 - Зайдите на http://localhost:8000/rollbar-test/, чтобы вызвать ошибку.
 - Откройте Rollbar Dashboard — ошибка должна отобразиться.
-  ```json
+```json
 "error": "division by zero"
 ```
